@@ -22,7 +22,7 @@ export function createRouter() {
       views[key].classList.toggle("hidden", key !== route);
     }
 
-    // activar botón en nav (solo para rutas que estén en nav)
+    // activar botón en nav
     for (const b of navButtons) {
       b.classList.toggle("is-active", b.dataset.route === route);
     }
