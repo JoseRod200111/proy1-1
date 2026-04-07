@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proyecto #1 — Blog</title>
+  <link rel="stylesheet" href="./src/css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <div class="brand">
+        <span class="brand__logo">🟢</span>
+        <div>
+          <div class="brand__title">Green Blog</div>
+          <div class="brand__sub">Proyecto #1 — Web (API + DOM + Forms)</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav__btn is-active" data-route="home">Inicio</button>
+        <button class="nav__btn" data-route="create">Crear</button>
+        <button class="nav__btn" data-route="favorites">Favoritos</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!--  HOME / LISTADO -->
+    <section id="view-home" class="view">
+      <div class="view__head">
+        <div>
+          <h1 class="h1">Publicaciones</h1>
+          <p class="muted"></p>
+        </div>
+      </div>
+
+   
+      <section class="card card--form">
+        <label class="label">
+          Buscar texto (título/contenido)
+          <input id="f-q" class="input" type="text" placeholder="ej. love, forest, candy..." />
+        </label>
+
+        <label class="label">
+          Filtrar por User ID
+          <input id="f-user" class="input" type="number" min="1" placeholder="ej. 5" />
+        </label>
+
+        <label class="label">
+  Autor (nombre contiene)
+  <input id="f-author" class="input" type="text" placeholder="ej. User #121" />
+</label>
+
+        <div class="row">
+          <button id="btn-apply-filters" class="btn" type="button">Aplicar</button>
+          <button id="btn-clear-filters" class="btn btn--ghost" type="button">Limpiar</button>
+        </div>
+
+        <p class="muted small">
+        </p>
+      </section>
+
+      <!-- UI STATE: Home -->
+      <section id="home-state" class="state state--idle">
+        <div class="state__idle">
+          <button id="btn-load" class="btn">Cargar publicaciones</button>
+        </div>
+
+        <div class="state__loading">
+          <div class="loader"></div>
+          <div>Cargando publicaciones…</div>
+        </div>
+
+        <div class="state__error">
+          <div class="msg msg--error">
+            <div class="msg__title">Error cargando publicaciones</div>
+            <div id="home-error" class="msg__body"></div>
+            <button id="btn-home-retry" class="btn btn--ghost" type="button">Retry</button>
+          </div>
+        </div>
+
+        <div class="state__empty">
+          <div class="msg msg--empty">
+            <div class="msg__title">Sin resultados</div>
+            <div class="msg__body">No hay publicaciones para mostrar.</div>
+            <button id="btn-home-empty-retry" class="btn btn--ghost" type="button">Retry</button>
+          </div>
+        </div>
+
+        <div class="state__success">
+          <!-- Paginación -->
+          <div class="pager">
+            <button id="btn-prev" class="btn btn--ghost" type="button">← Anterior</button>
+            <div class="pager__info">
+              Página <span id="page-now">1</span> / <span id="page-total">1</span>
+            </div>
+            <button id="btn-next" class="btn btn--ghost" type="button">Siguiente →</button>
+          </div>
+
+          <!-- Resultados -->
+          <div id="home-results" class="grid"></div>
+        </div>
+      </section>
+    </section>
+
+    <!--  DETALLE  -->
+    <section id="view-detail" class="view hidden">
+      <div class="view__head">
+        <div>
+          <h1 class="h1">Detalle</h1>
+          <p class="muted"></p>
+        </div>
+        <button id="btn-back" class="btn btn--ghost" type="button">← Volver</button>
+      </div>
+
+      <section id="detail-state" class="state state--idle">
+        <div class="state__idle">
+          <div class="msg msg--empty">
+            <div class="msg__title">Selecciona una publicación</div>
+            <div class="msg__body">Desde Inicio, presiona “Ver más”.</div>
+          </div>
+        </div>
+
+        <div class="state__loading">
+          <div class="loader"></div>
+          <div>Cargando detalle…</div>
+        </div>
+
+        <div class="state__error">
+          <div class="msg msg--error">
+            <div class="msg__title">Error cargando detalle</div>
+            <div id="detail-error" class="msg__body"></div>
+            <button id="btn-detail-retry" class="btn btn--ghost" type="button">Retry</button>
+          </div>
+        </div>
+
+        <div class="state__success">
+          <article id="detail-card" class="card"></article>
+
+          <!-- EDITAR o ELIMINAR -->
+          <div class="row">
+            <button id="btn-fav" class="btn" type="button">Agregar a favoritos</button>
+            <button id="btn-delete" class="btn btn--ghost" type="button">Eliminar</button>
+          </div>
+
+          <div id="detail-success-msg" class="hint"></div>
+        </div>
+      </section>
+    </section>
+
+    <!--  CREAR  -->
+    <section id="view-create" class="view hidden">
+      <div class="view__head">
+        <div>
+          <h1 class="h1">Crear publicación</h1>
+          <p class="muted"></p>
+        </div>
+      </div>
+
+      <form id="create-form" class="card card--form">
+        <label class="label">
+          Título (mín. 5 caracteres)
+          <input id="c-title" class="input" type="text" maxlength="80" />
+        </label>
+
+        <label class="label">
+          Contenido (mín. 20 caracteres)
+          <textarea id="c-body" class="textarea" maxlength="800"></textarea>
+        </label>
+
+        <label class="label">
+          User ID (número > 0)
+          <input id="c-userId" class="input" type="number" min="1" value="1" />
+        </label>
+
+        <div class="row">
+          <button class="btn" type="submit">Crear (POST)</button>
+          <button id="btn-create-clear" class="btn btn--ghost" type="button">Limpiar</button>
+        </div>
+
+        <div id="create-validation" class="hint"></div>
+      </form>
+
+      <section id="create-state" class="state state--idle">
+        <div class="state__loading">
+          <div class="loader"></div>
+          <div>Creando publicación…</div>
+        </div>
+
+        <div class="state__error">
+          <div class="msg msg--error">
+            <div class="msg__title">No se pudo crear</div>
+            <div id="create-error" class="msg__body"></div>
+          </div>
+        </div>
+
+        <div class="state__success">
+          <div class="msg msg--success">
+            <div class="msg__title">Creación exitosa (respuesta del API)</div>
+            <pre id="create-json" class="code"></pre>
+          </div>
+        </div>
+      </section>
+    </section>
+    <section id="view-favorites" class="view hidden">
+      <div class="view__head">
+        <div>
+          <h1 class="h1">Favoritos</h1>
+          <p class="muted"></p>
+        </div>
+      </div>
+
+      <section id="fav-state" class="state state--idle">
+        <div class="state__idle">
+          <div class="msg msg--empty">
+            <div class="msg__title">Aún no tienes favoritos</div>
+            <div class="msg__body">Abre un detalle y presiona “Agregar a favoritos”.</div>
+          </div>
+        </div>
+
+        <div class="state__success">
+          <div class="row">
+            <button id="btn-fav-clear" class="btn btn--ghost" type="button">Vaciar favoritos</button>
+          </div>
+          <div id="fav-results" class="grid"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <span class="muted">HTML/CSS/JS puro — Proyecto #1</span>
+  </footer>
+
+  <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>
